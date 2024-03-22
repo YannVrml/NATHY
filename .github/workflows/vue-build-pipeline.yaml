@@ -55,8 +55,8 @@ jobs:
         with:
           context: ./webapp
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: webapp-${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta.outputs.tags }}-webapp
+          labels: ${{ steps.meta.outputs.labels }}
 
   trigger_deployment:
     name: Trigger the deployment in portainer

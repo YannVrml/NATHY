@@ -47,8 +47,8 @@ jobs:
           context: ./api
           file: ./api/docker/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: api-${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta.outputs.tags }}-api
+          labels: ${{ steps.meta.outputs.labels }}
 
   trigger_deployment:
     name: Trigger the deployment in portainer
