@@ -41,11 +41,9 @@ jobs:
         id: env
         run: |
           if [[ ${{ github.ref }} == "refs/heads/main" ]]; then
-            echo "env=MAIN" >> $GITHUB_ENV
+            echo "env=WEBAPP_MAIN" >> $GITHUB_ENV
           elif [[ ${{ github.ref }} == "refs/heads/preprod" ]]; then
-            echo "env=PREPROD" >> $GITHUB_ENV
-          else
-            echo "env=DEV" >> $GITHUB_ENV
+            echo "env=WEBAPP_PREPROD" >> $GITHUB_ENV
           fi
         shell: bash
 
