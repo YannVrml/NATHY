@@ -1,8 +1,9 @@
 <script setup lang="ts">
+
 </script>
 
 <template>
-  <main>
-    <h1>Home</h1>
-  </main>
+  <VBtn :to="{ name: 'choose-metro' }">Prendre le metro ?</VBtn>
 </template>
+
+<style lang="scss" scoped></style>
