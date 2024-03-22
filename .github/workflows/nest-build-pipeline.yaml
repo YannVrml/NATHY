@@ -46,8 +46,8 @@ jobs:
         with:
           context: ./api
           file: ./api/docker/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          push: false
+          tags: api-${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
   trigger_deployment:
