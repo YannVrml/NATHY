@@ -55,7 +55,7 @@ jobs:
         with:
           context: ./webapp
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: webapp-${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
   trigger_deployment:
