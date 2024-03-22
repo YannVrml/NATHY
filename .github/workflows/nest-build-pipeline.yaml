@@ -46,7 +46,7 @@ jobs:
         with:
           context: ./api
           file: ./api/docker/Dockerfile
-          push: false
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: api-${{ steps.meta.outputs.labels }}
 
