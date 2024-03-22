@@ -1,14 +1,27 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref } from 'vue';
 import { RouterView } from 'vue-router'
 
-const environment = computed<string>(() => import.meta.env.VITE_ENVIRONMENT);
+const drawer = ref(false);
 </script>
 
 <template>
-  <header>
-    <h1>Nathy {{ environment }}</h1>
-  </header>
+  <VApp>
+    <VAppBar>
+      <VAppBarNavIcon @click="drawer = !drawer" />
+      <VAppBarTitle>Nathy</VAppBarTitle>
+    </VAppBar>
 
-  <RouterView />
+    <VNavigationDrawer v-model="drawer" temporary>
+      <VList>
+        <VListItem :to="{name: 'home'}">Home</VListItem>
+        <VListItem :to="{name: 'about'}">About</VListItem>
+      </VList>
+    </VNavigationDrawer>
+
+    <VMain>
+      <RouterView />
+    </VMain>
+  </VApp>
+
 </template>
