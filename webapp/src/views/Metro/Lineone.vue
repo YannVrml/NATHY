@@ -19,11 +19,21 @@ const ArretDeMetro = ref([
   { nom: 'Nom13', time: 13 },
   { nom: 'Nom14', time: 14 }
 ]);
+
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const navigateToOtherPage = (arretName: string) => {
+  console.log(arretName);
+  router.push({ name: 'Station', params: { arretName } });
+};
+
 </script>
 
 <template>
   <main>
-    <div v-for="(arret, index) in ArretDeMetro" :key="index" class="arret-container">
+    <div v-for="(arret, index) in ArretDeMetro" :key="index" class="arret-container" @click="navigateToOtherPage(arret.nom)">
       <div class="arret-nom">{{ arret.nom }}</div>
       <div class="arret-time">
         <template v-if="arret.time === 0">Arrivé</template>

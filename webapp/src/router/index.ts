@@ -4,6 +4,7 @@ import AboutView from '@/views/AboutView.vue'
 import ChooseMetroView from '@/views/Metro/ChooseMetroView.vue'
 import LineOneView from '@/views/Metro/Lineone.vue'
 import LineTwoView from '@/views/Metro/Linetwo.vue'
+import Station from '@/views/Stations.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,6 +24,11 @@ const router = createRouter({
       name: 'Line-two',
       component: LineTwoView
     },
+    {
+      path: '/Stations/:arretName',
+      name: 'Station',
+      component: Station
+    }
   ]
 })
 
