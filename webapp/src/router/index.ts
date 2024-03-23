@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import AboutView from '@/views/AboutView.vue'
 import ChooseMetroView from '@/views/Metro/ChooseMetroView.vue'
+import LineOneView from '@/views/Metro/Lineone.vue'
+import LineTwoView from '@/views/Metro/Linetwo.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -9,12 +11,17 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView
+      component: ChooseMetroView
     },
     {
-      path: '/metro/choose-metro',
-      name: 'choose-metro',
-      component: ChooseMetroView
+      path: '/line/1',
+      name: 'Line-one',
+      component: LineOneView
+    },
+    {
+      path: '/line/2',
+      name: 'Line-two',
+      component: LineTwoView
     },
   ]
 })
