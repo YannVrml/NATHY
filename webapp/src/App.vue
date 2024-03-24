@@ -1,14 +1,30 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref } from 'vue'
 import { RouterView } from 'vue-router'
+import Logo from './components/Logo.vue'
+import LocalisationDialog from './components/dialogs/LocalisationDialog.vue';
 
-const environment = computed<string>(() => import.meta.env.VITE_ENVIRONMENT);
+const drawer = ref(false);
 </script>
 
 <template>
-  <header>
-    <h1>Nathy {{ environment }}</h1>
-  </header>
+  <VApp>    
+    <VAppBar>
+      <Logo class="pointer" @click="$router.push({name: 'home'})" />
+    </VAppBar>
 
-  <RouterView />
+    <VNavigationDrawer v-model="drawer" temporary>
+      <VList>
+        <VListItem :to="{ name: 'home' }">Home</VListItem>
+      </VList>
+    </VNavigationDrawer>
+
+    <VMain>
+      <div class="d-flex h-100 align-center justify-center">
+        <RouterView />
+      </div>
+    </VMain>
+
+    <LocalisationDialog />
+  </VApp>
 </template>
