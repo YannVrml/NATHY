@@ -1,43 +1,49 @@
 <template>
-  <LocalisationDialog v-model="localisationModal" @agree="localisationModal = false; getGeoloc()" @disagree="localisationModal = false" />
   <FullScreenChoice :choices="choices" @choosed="choosed" />
 </template>
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import LocalisationDialog from '@/components/dialogs/LocalisationDialog.vue';
 import FullScreenChoice from '@/components/FullScreenChoice.vue';
 import { useGeolocStore } from '@/stores/geoloc.store';
 import type { Choice } from '@/types/Choice';
 import { ref } from 'vue';
+import { onMounted } from 'vue';
+import type { MetroLine } from '@/types/MetroLine'
+import { useIleviaMetroStore } from '@/stores/ileviaMetro.store';
+import { computed } from 'vue';
+import { watch } from 'vue';
 
 const router = useRouter();
 
-const choices = ref<Choice[]>([
-  {
-    id: 1,
-    title: 'M1',
-    color: 'rgb(253, 196, 31)',
-    textColor: 'black',
-    path: '/line/1'
-  },
-  {
-    id: 2,
-    title: 'M2',
-    color: 'rgb(227, 6, 19)',
-    textColor: 'white',
-    path: '/line/2'
+const geolocStore = useGeolocStore();
+const ileviaStore = useIleviaMetroStore();
+
+const choices = computed(() => {
+  return ileviaStore.metroLines.map<Choice>((line) => {
+    return {
+      id: line.id,
+      title: line.code,
+      description: line.name,
+      icon: 'mdi-subway-variant',
+      color: line.color,
+      textColor: line.text_color,
+    };
+  }) ?? [];
+});
+
+watch(() => geolocStore.hasGeoloc, (hasGeoloc) => {
+  if (hasGeoloc) {
+    const nearestStopAreas = ileviaStore.nearStopAreas(geolocStore.latitude, geolocStore.longitude);
   }
-]);
+});
 
 const localisationModal = ref<boolean>(true);
 
 const choosed = (choice: Choice) => {
-  console.log(choice);
-  router.push(choice.path);
+  router.push({ name: 'Line', params: { id: choice.id } });
 }
 
-const geolocStore = useGeolocStore();
 
 const getGeoloc = async () => {
   await geolocStore.requestNavGeoloc();
