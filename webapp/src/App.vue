@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { RouterView } from 'vue-router'
+import Logo from './components/Logo.vue'
+import LocalisationDialog from './components/dialogs/LocalisationDialog.vue';
 
-const drawer = ref(false)
+const drawer = ref(false);
 </script>
 
 <template>
-  <VApp>
+  <VApp>    
     <VAppBar>
-      <VAppBarNavIcon @click="drawer = !drawer" />
-      <VAppBarTitle>Nathy</VAppBarTitle>
+      <Logo class="pointer" @click="$router.push({name: 'home'})" />
     </VAppBar>
 
     <VNavigationDrawer v-model="drawer" temporary>
@@ -23,5 +24,7 @@ const drawer = ref(false)
         <RouterView />
       </div>
     </VMain>
+
+    <LocalisationDialog />
   </VApp>
 </template>

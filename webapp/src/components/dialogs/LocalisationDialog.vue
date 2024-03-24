@@ -1,5 +1,5 @@
 <template>
-  <VDialog v-model="opened">
+  <VDialog v-model="geolocStore.dialogModel">
     <VCard
         prepend-icon="mdi-map-marker"
         text="Let Nathy determine your location to find the nearest metro station. This means sending anonymous location data to Nathy."
@@ -8,11 +8,11 @@
         <template v-slot:actions>
           <VSpacer></VSpacer>
 
-          <v-btn @click="opened = false; emit('disagree')">
+          <v-btn @click="disagree">
             Disagree
           </v-btn>
 
-          <v-btn @click="opened = false; emit('agree')">
+          <v-btn @click="agree">
             Agree
           </v-btn>
         </template>
@@ -21,13 +21,25 @@
 </template>
 
 <script setup lang="ts">
+import { useGeolocStore } from '@/stores/geoloc.store';
+import { onMounted } from 'vue';
 
-const opened = defineModel<boolean>();
+
+const geolocStore = useGeolocStore();
 
 const emit = defineEmits(["agree", "disagree"]);
 
+const agree = async () => {
+  geolocStore.dialogModel = false;
+  geolocStore.getPosition();
+}
+
+const disagree = () => {
+  geolocStore.dialogModel = false;
+}
+
+onMounted(() => {
+  geolocStore.requestNavGeoloc();
+})
+
 </script>
-
-<style lang="scss" scoped>
-
-</style>
