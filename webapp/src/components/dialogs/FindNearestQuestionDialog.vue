@@ -8,7 +8,7 @@
           md="6"
           v-ripple
           @click="
-            emit('yes')
+            emit('yes');
             dialog = false
           "
         >
@@ -24,7 +24,7 @@
           md="6"
           v-ripple
           @click="
-            emit('no')
+            emit('no');
             dialog = false
           "
         >
