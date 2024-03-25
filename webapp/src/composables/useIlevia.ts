@@ -1,4 +1,8 @@
-import type { LinesResponse, NextDeparturesResponse, StopAreasResponse } from '@/types/IleviaAPIResponse'
+import type {
+  LinesResponse,
+  NextDeparturesResponse,
+  StopAreasResponse
+} from '@/types/IleviaAPIResponse'
 import { ofetch } from 'ofetch'
 
 export const useIlevia = () => {
@@ -6,7 +10,7 @@ export const useIlevia = () => {
 
   return {
     lines: () => {
-      return ofetch<LinesResponse>(`${apiBaseUrl}`);
+      return ofetch<LinesResponse>(`${apiBaseUrl}`)
     },
 
     stop_area: (lineId: string) => {
@@ -14,7 +18,9 @@ export const useIlevia = () => {
     },
 
     next_departures: (lineId: string, stopPointId: string, routeId: string) => {
-      return ofetch<NextDeparturesResponse>(`${apiBaseUrl}/${lineId}/${stopPointId}/${routeId}/departures`)
+      return ofetch<NextDeparturesResponse>(
+        `${apiBaseUrl}/${lineId}/${stopPointId}/${routeId}/departures`
+      )
     }
   }
 }

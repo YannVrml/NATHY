@@ -1,4 +1,4 @@
 export enum DirectionType {
-  FORWARD = "forward",
-  BACKWARD = "backward"
+  FORWARD = 'forward',
+  BACKWARD = 'backward'
 }

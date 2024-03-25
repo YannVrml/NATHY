@@ -1,16 +1,51 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { RouterView } from 'vue-router'
-import Logo from './components/Logo.vue'
-import LocalisationDialog from './components/dialogs/LocalisationDialog.vue';
+import { ref, watch } from 'vue'
+import { RouterView, useRouter } from 'vue-router'
+import AppLogo from './components/AppLogo.vue'
+import LocalisationDialog from './components/dialogs/LocalisationDialog.vue'
+import { useGeolocStore } from './stores/geoloc.store'
+import { useIleviaMetroStore } from './stores/ileviaMetro.store'
+import NoNearestStation from './components/dialogs/NoNearestStation.vue'
 
-const drawer = ref(false);
+const geolocStore = useGeolocStore()
+const ileviaStore = useIleviaMetroStore()
+const router = useRouter()
+
+const noNearestStation = ref<boolean>(false)
+
+const goToNearestStation = async (triggerDialog: boolean = false) => {
+  await ileviaStore.pendMetroLineFetch()
+  const nearestStopAreas = ileviaStore.nearStopAreas()
+  if (nearestStopAreas.length > 0)
+    return router.push({
+      name: 'Line',
+      params: { id: nearestStopAreas[0].line.id },
+      query: { stopPointId: nearestStopAreas[0].id }
+    })
+  if (triggerDialog) noNearestStation.value = true
+}
+
+watch(
+  () => geolocStore.hasGeoloc,
+  (hasGeoloc) => {
+    if (hasGeoloc) goToNearestStation()
+  },
+  { immediate: true }
+)
+
+const drawer = ref(false)
 </script>
 
 <template>
-  <VApp>    
+  <VApp>
     <VAppBar>
-      <Logo class="pointer" @click="$router.push({name: 'home'})" />
+      <VBtn icon @click="$router.push({ name: 'home' })">
+        <VIcon>mdi-home</VIcon>
+      </VBtn>
+      <AppLogo class="pointer" @click="$router.push({ name: 'home' })" />
+      <VBtn icon :disabled="!geolocStore.hasGeoloc" @click="goToNearestStation(true)">
+        <VIcon>mdi-map-marker-radius</VIcon>
+      </VBtn>
     </VAppBar>
 
     <VNavigationDrawer v-model="drawer" temporary>
@@ -26,5 +61,6 @@ const drawer = ref(false);
     </VMain>
 
     <LocalisationDialog />
+    <NoNearestStation v-model="noNearestStation" />
   </VApp>
 </template>
