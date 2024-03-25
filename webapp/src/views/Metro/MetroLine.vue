@@ -29,7 +29,7 @@ const stopPoints = computed(() => {
   }
   return stopAeras
 })
-const requestedStopPoint = computed(() =>
+const requestedStopPoint = ref(
   stopPoints.value.find((point) => point.id === route.query.stopPointId)
 )
 
@@ -46,6 +46,7 @@ const stopPointsWithRequested = computed(() => {
 onMounted(() => {
   if (!line.value) router.push({ name: 'home' })
   if (requestedStopPoint.value) stopPointExpanded.value = requestedStopPoint.value.id
+  else if (stopPoints.value.length > 0) stopPointExpanded.value = stopPoints.value[0].id
   if (nextDeparturesInterval !== null) clearInterval(nextDeparturesInterval)
   nextDeparturesInterval = setInterval(fetchNextDepartures, 15000)
 })
@@ -65,55 +66,62 @@ watch(
   () => stopPointExpanded.value,
   () => {
     fetchNextDepartures()
+    router.push({ query: { stopPointId: stopPointExpanded.value } })
   }
 )
 </script>
 
 <template>
-  <VExpansionPanels v-model="stopPointExpanded" class="pa-5">
-    <VExpansionPanel v-for="point in stopPointsWithRequested" :key="point.id" :value="point.id">
-      <VExpansionPanelTitle>{{ point.label }}</VExpansionPanelTitle>
-      <VExpansionPanelText>
-        <VRow v-if="point.nextDepartures">
-          <VCol cols="auto" v-if="point.nextDepartures.forward?.route">
-            <h5>
-              <VIcon>mdi-map-marker-right-outline</VIcon>
-              {{ point.nextDepartures.forward.route.direction.name }}
-            </h5>
-            <VList>
-              <VListItem
-                v-for="(departure, index) in point.nextDepartures.forward.times"
-                :key="index"
-              >
-                <VListItemTitle
-                  ><VIcon>mdi-clock-outline</VIcon> {{ timeHelpers.timeTo(departure) }} -
-                  {{ timeHelpers.timeFromDate(departure) }}</VListItemTitle
+  <div class="pa-5">
+    <VCard :color="line?.color">
+      <VCardTitle>{{ line?.code }}</VCardTitle>
+      <VCardText>{{ line?.name }}</VCardText>
+    </VCard>
+    <VExpansionPanels :color="line?.color" v-model="stopPointExpanded" class="mt-5">
+      <VExpansionPanel v-for="point in stopPointsWithRequested" :key="point.id" :value="point.id">
+        <VExpansionPanelTitle>{{ point.label }}</VExpansionPanelTitle>
+        <VExpansionPanelText>
+          <VRow v-if="point.nextDepartures">
+            <VCol cols="auto" v-if="point.nextDepartures.forward?.route">
+              <h5>
+                <VIcon>mdi-map-marker-right-outline</VIcon>
+                {{ point.nextDepartures.forward.route.direction.name }}
+              </h5>
+              <VList>
+                <VListItem
+                  v-for="(departure, index) in point.nextDepartures.forward.times"
+                  :key="index"
                 >
-              </VListItem>
-            </VList>
-          </VCol>
-          <VCol cols="auto" v-if="point.nextDepartures.backward?.route">
-            <h5>
-              <VIcon>mdi-map-marker-left-outline</VIcon>
-              {{ point.nextDepartures.backward.route.direction.name }}
-            </h5>
-            <VList>
-              <VListItem
-                v-for="(departure, index) in point.nextDepartures.backward.times"
-                :key="index"
-              >
-                <VListItemTitle
-                  ><VIcon>mdi-clock-outline</VIcon> {{ timeHelpers.timeTo(departure) }} -
-                  {{ timeHelpers.timeFromDate(departure) }}</VListItemTitle
+                  <VListItemTitle
+                    ><VIcon>mdi-clock-outline</VIcon> {{ timeHelpers.timeTo(departure) }} -
+                    {{ timeHelpers.timeFromDate(departure) }}</VListItemTitle
+                  >
+                </VListItem>
+              </VList>
+            </VCol>
+            <VCol cols="auto" v-if="point.nextDepartures.backward?.route">
+              <h5>
+                <VIcon>mdi-map-marker-left-outline</VIcon>
+                {{ point.nextDepartures.backward.route.direction.name }}
+              </h5>
+              <VList>
+                <VListItem
+                  v-for="(departure, index) in point.nextDepartures.backward.times"
+                  :key="index"
                 >
-              </VListItem>
-            </VList>
-          </VCol>
-        </VRow>
-        <VProgressLinear v-else indeterminate />
-      </VExpansionPanelText>
-    </VExpansionPanel>
-  </VExpansionPanels>
+                  <VListItemTitle
+                    ><VIcon>mdi-clock-outline</VIcon> {{ timeHelpers.timeTo(departure) }} -
+                    {{ timeHelpers.timeFromDate(departure) }}</VListItemTitle
+                  >
+                </VListItem>
+              </VList>
+            </VCol>
+          </VRow>
+          <VProgressLinear v-else indeterminate />
+        </VExpansionPanelText>
+      </VExpansionPanel>
+    </VExpansionPanels>
+  </div>
 </template>
 
 <style lang="scss" scoped>
