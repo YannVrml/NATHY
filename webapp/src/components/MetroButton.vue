@@ -5,7 +5,7 @@
 <script setup lang="ts">
 defineProps({
   id_metro: {
-    type: String,
+    type: String
   }
-});
+})
 </script>

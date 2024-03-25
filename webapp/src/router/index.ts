@@ -1,38 +1,40 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import ChooseMetroView from '@/views/Metro/ChooseMetroView.vue'
-import LineView from '@/views/Metro/Line.vue'
-import Station from '@/views/Stations.vue'
+import MetroLineView from '@/views/Metro/MetroLine.vue'
 import { useIleviaMetroStore } from '@/stores/ileviaMetro.store'
+import DefaultLayout from '@/layouts/DefaultLayout.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: ChooseMetroView
-    },
-    {
-      path: '/line/:id',
-      name: 'Line',
-      component: LineView
-    },
-    {
-      path: '/Stations/:arretName',
-      name: 'Station',
-      component: Station
+      name: 'defaultLayout',
+      component: DefaultLayout,
+      children: [
+        {
+          path: '/',
+          name: 'home',
+          component: ChooseMetroView
+        },
+        {
+          path: '/line/:id',
+          name: 'Line',
+          component: MetroLineView
+        }
+      ]
     }
   ]
-});
+})
 
 router.beforeEach(async (to, from, next) => {
-  const ileviaStore = useIleviaMetroStore();
+  const ileviaStore = useIleviaMetroStore()
 
   if (ileviaStore.metroLines.length === 0) {
-    await ileviaStore.getMetroLines();
+    await ileviaStore.getMetroLines()
   }
 
-  next();
+  next()
 })
 
 export default router
