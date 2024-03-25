@@ -1,5 +1,5 @@
 import { Controller, Get, Param, UseInterceptors } from '@nestjs/common';
-import { type IleviaService } from './ilevia.service';
+import { IleviaService } from './ilevia.service';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import {
   DAY_TO_MILLISECONDS,
