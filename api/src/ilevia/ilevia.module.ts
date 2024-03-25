@@ -6,6 +6,6 @@ import { CacheModule } from '@nestjs/cache-manager';
 @Module({
   imports: [CacheModule.register()],
   controllers: [IleviaController],
-  providers: [IleviaService]
+  providers: [IleviaService],
 })
 export class IleviaModule {}

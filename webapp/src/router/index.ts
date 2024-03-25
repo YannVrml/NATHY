@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import ChooseMetroView from '@/views/Metro/ChooseMetroView.vue'
-import LineView from '@/views/Metro/Line.vue'
-import Station from '@/views/Stations.vue'
+import MetroLineView from '@/views/Metro/MetroLine.vue'
 import { useIleviaMetroStore } from '@/stores/ileviaMetro.store'
 
 const router = createRouter({
@@ -15,24 +14,19 @@ const router = createRouter({
     {
       path: '/line/:id',
       name: 'Line',
-      component: LineView
-    },
-    {
-      path: '/Stations/:arretName',
-      name: 'Station',
-      component: Station
+      component: MetroLineView
     }
   ]
-});
+})
 
 router.beforeEach(async (to, from, next) => {
-  const ileviaStore = useIleviaMetroStore();
+  const ileviaStore = useIleviaMetroStore()
 
   if (ileviaStore.metroLines.length === 0) {
-    await ileviaStore.getMetroLines();
+    await ileviaStore.getMetroLines()
   }
 
-  next();
+  next()
 })
 
 export default router

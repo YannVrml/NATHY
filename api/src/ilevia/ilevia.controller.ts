@@ -1,7 +1,10 @@
 import { Controller, Get, Param, UseInterceptors } from '@nestjs/common';
-import { IleviaService } from './ilevia.service';
+import { type IleviaService } from './ilevia.service';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
-import { DAY_TO_MILLISECONDS, SECOND_TO_MILLISECONDS } from 'src/constants/duration.const';
+import {
+  DAY_TO_MILLISECONDS,
+  SECOND_TO_MILLISECONDS,
+} from 'src/constants/duration.const';
 
 @Controller('ilevia')
 @UseInterceptors(CacheInterceptor)
@@ -29,5 +32,4 @@ export class IleviaController {
   ) {
     return this.IleviaService.nextDepartures(lineId, stopPointId, routeId);
   }
-
 }

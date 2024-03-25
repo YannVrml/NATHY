@@ -1,25 +1,53 @@
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useIleviaMetroStore } from '@/stores/ileviaMetro.store'
 import { onBeforeUnmount } from 'vue'
-import { useTimeHelpers } from '@/composables/timeHelpers';
+import { useTimeHelpers } from '@/composables/timeHelpers'
+import { watch } from 'vue'
+import { useGeolocStore } from '@/stores/geoloc.store'
 
 let nextDeparturesInterval: number | null = null
 
 const router = useRouter()
 const route = useRoute()
 const ileviaStore = useIleviaMetroStore()
-const timeHelpers = useTimeHelpers();
+const timeHelpers = useTimeHelpers()
+const geolocStore = useGeolocStore()
+
+const stopPointExpanded = ref<string | null>(null)
 
 const line = computed(() => ileviaStore.metroLines.find((line) => line.id === route.params.id))
-const stopPoints = computed(() => line.value?.stop_areas ?? [])
+const stopPoints = computed(() => {
+  const stopAeras = [...(line.value?.stop_areas ?? [])]
+  if (geolocStore.hasGeoloc) {
+    stopAeras.sort((a, b) => {
+      const aDistance = geolocStore.distanceTo(a.coord.lat, a.coord.lon)
+      const bDistance = geolocStore.distanceTo(b.coord.lat, b.coord.lon)
+      return aDistance - bDistance
+    }) ?? []
+  }
+  return stopAeras
+})
+const requestedStopPoint = computed(() =>
+  stopPoints.value.find((point) => point.id === route.query.stopPointId)
+)
+
+const stopPointsWithRequested = computed(() => {
+  if (requestedStopPoint.value?.id) {
+    return [
+      requestedStopPoint.value,
+      ...stopPoints.value.filter((point) => point.id !== requestedStopPoint.value?.id)
+    ]
+  }
+  return stopPoints.value
+})
 
 onMounted(() => {
   if (!line.value) router.push({ name: 'home' })
+  if (requestedStopPoint.value) stopPointExpanded.value = requestedStopPoint.value.id
   if (nextDeparturesInterval !== null) clearInterval(nextDeparturesInterval)
-  fetchNextDepartures()
-  nextDeparturesInterval = setInterval(fetchNextDepartures, 50000)
+  nextDeparturesInterval = setInterval(fetchNextDepartures, 15000)
 })
 
 onBeforeUnmount(() => {
@@ -27,22 +55,23 @@ onBeforeUnmount(() => {
 })
 
 const fetchNextDepartures = async () => {
-  await Promise.all(
-    stopPoints.value.map(async (point) => {
-      await ileviaStore.populateNextDepartures(point)
-    })
-  )
+  const stopPoint = stopPoints.value.find((point) => point.id === stopPointExpanded.value)
+  if (stopPoint) {
+    await ileviaStore.populateNextDepartures(stopPoint)
+  }
 }
 
-const navigateToOtherPage = (arretName: string) => {
-  console.log(arretName)
-  router.push({ name: 'Station', params: { arretName } })
-}
+watch(
+  () => stopPointExpanded.value,
+  () => {
+    fetchNextDepartures()
+  }
+)
 </script>
 
 <template>
-  <VExpansionPanels mandatory class="pa-5">
-    <VExpansionPanel v-for="point in stopPoints" :key="point.id">
+  <VExpansionPanels v-model="stopPointExpanded" class="pa-5">
+    <VExpansionPanel v-for="point in stopPointsWithRequested" :key="point.id" :value="point.id">
       <VExpansionPanelTitle>{{ point.label }}</VExpansionPanelTitle>
       <VExpansionPanelText>
         <VRow v-if="point.nextDepartures">
@@ -56,7 +85,10 @@ const navigateToOtherPage = (arretName: string) => {
                 v-for="(departure, index) in point.nextDepartures.forward.times"
                 :key="index"
               >
-                <VListItemTitle><VIcon>mdi-clock-outline</VIcon> {{ timeHelpers.timeTo(departure) }} - {{ timeHelpers.timeFromDate(departure) }}</VListItemTitle>
+                <VListItemTitle
+                  ><VIcon>mdi-clock-outline</VIcon> {{ timeHelpers.timeTo(departure) }} -
+                  {{ timeHelpers.timeFromDate(departure) }}</VListItemTitle
+                >
               </VListItem>
             </VList>
           </VCol>
@@ -70,7 +102,10 @@ const navigateToOtherPage = (arretName: string) => {
                 v-for="(departure, index) in point.nextDepartures.backward.times"
                 :key="index"
               >
-                <VListItemTitle><VIcon>mdi-clock-outline</VIcon> {{ timeHelpers.timeTo(departure) }} - {{ timeHelpers.timeFromDate(departure) }}</VListItemTitle>
+                <VListItemTitle
+                  ><VIcon>mdi-clock-outline</VIcon> {{ timeHelpers.timeTo(departure) }} -
+                  {{ timeHelpers.timeFromDate(departure) }}</VListItemTitle
+                >
               </VListItem>
             </VList>
           </VCol>
